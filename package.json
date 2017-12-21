@@ -1,0 +1,27 @@
+{
+  "name": "btc-debug",
+  "version": "0.1.0",
+  "main": "src/main.js",
+  "description": "An RPC console for bitcoin node, similar to bitcoin-qt debug window",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/rsbondi/btc-debug"
+  },
+  "scripts": {
+    "build": "riot ./src/tags ./src/js/tags.js",
+    "start": "npm run build | ./node_modules/.bin/electron .",
+    "test": "node ./test/main-test.js"
+  },
+  "devDependencies": {
+    "@types/electron": "^1.6.10",
+    "electron": "^1.7.9",
+    "spectron": "^3.7.2"
+  },
+  "dependencies": {
+    "monaco-editor": "^0.10.1",
+    "riot": "^3.7.4",
+    "riot-observable": "^3.0.0"
+  },
+  "author": "Richard Bondi",
+  "license": "MIT"
+}
