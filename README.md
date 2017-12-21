@@ -1,4 +1,4 @@
-# btcrpc-console
+# btc-debug
 
 ## Description
 A clone of bitcoin-qt debug window for use with local or remote daemon
