@@ -1,7 +1,7 @@
 # btc-debug
 
 ## Description
-A clone of bitcoin-qt debug window for use with local or remote daemon
+A clone of bitcoin-qt debug window for use with local or remote daemon, with enhnced console and other minor differences.
 
 ## Getting started
 ### Installation

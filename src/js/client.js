@@ -1,3 +1,47 @@
+const { remote } = require('electron')
+const { Menu, MenuItem, dialog } = remote
+const fs = require('fs')
+
+const menu = new Menu()
+
+function saveEditor(editor) {
+  var savePath = dialog.showSaveDialog({});
+  if (savePath) {
+    fs.writeFile(savePath, editor.getValue(), function (err) {
+      console.log('savePath', err)
+    });
+  }
+}
+
+function loadEditor(editor) {
+  dialog.showOpenDialog(function (fileNames) {
+    if (fileNames === undefined) return;
+    var fileName = fileNames[0];
+    fs.readFile(fileName, 'utf-8', function (err, data) {
+      editor.setValue(data)
+    });
+
+  });
+
+}
+
+menu.append(new MenuItem({
+  label: 'Command',
+  submenu: [
+    { label: 'Execute at Cursor', click() { window.commandEditor.getAction('action-execute-command').run() } },
+    { label: 'Save', click() { saveEditor(window.commandEditor) } },
+    { label: 'Load', click() { loadEditor(window.commandEditor) } },
+  ]
+}))
+menu.append(new MenuItem({
+  label: 'Console',
+  submenu: [
+    { label: 'Clear', click() { window.resultEditor.getAction('action-result-clear-command').run() } },
+    { label: 'Save', click() { saveEditor(window.resultEditor) } },
+    { label: 'Load', click() { loadEditor(window.resultEditor) } },
+  ]
+}))
+Menu.setApplicationMenu(menu)
 
 const argv = require('electron').remote.process.argv
 let tabs = document.querySelectorAll('.tab')
@@ -11,7 +55,6 @@ let helpers = []
 let netinfo = []
 const BLOCK_INTERVAL = 1000*60 * .5
 let graphindex = 0
-const fs = require('fs')
 const os = require('os')
 let user, password, host, port
 const createNS = document.createElementNS // riot breaks this so preserve
@@ -42,8 +85,6 @@ config.split('\n').forEach(line => {
   if (rpcpass) password = rpcpass[1]
 })
 
-document.querySelector('#clear-console').addEventListener('click', () => resultEditor.setValue(''))
-
 for(let t=0; t<tabs.length;t++) {
   const tab = tabs[t]
   tab.addEventListener('click', (e) => {
@@ -72,6 +113,7 @@ const getHelp = function() {
         }
         return o
       }, [])
+      editorModule.registerTokens(window.helpers.map(h => h.command))
     })
   resultEditor.layout()
   commandEditor.layout()
@@ -170,69 +212,34 @@ function post(payload) {
  
 }
 window.postRPC = post
+let helpContent = {} // cache help content
+window.getHelpContent = function(key) {
+  if(!~window.helpers.map(h => h.command).indexOf(key)) {
+      return new Promise(resolve => resolve({results:[]}))
+  }
+  if(helpContent[key]) {
+      let promise = new Promise((resolve, reject) => {
+          resolve(helpContent[key])
+      })
+      return promise
+  } else return window.postRPC({ method: 'help', params: [key] }).then(resp => {
+      helpContent[key] = resp
+      return resp
+    })
+}
 
 // TODO: probably move all this to editor.js?
 editorModule.require(['vs/editor/editor.main'], function () {
+  const resultModule = require('./js/resultEditor')
+  const commandModule = require('./js/commandEditor')
   monaco.languages.register({ id: 'bitcoin-rpc' });
   window.resultEditor = monaco.editor.create(consoleDisplay, editorModule.displayConfig);
   window.commandEditor = monaco.editor.create(consoleCommand, editorModule.commandConfig);
   window.addEventListener('resize', () => { resultEditor.layout(); commandEditor.layout();})
-  window.commandEditor.onKeyUp(e => {
-    consoleCommand.title = ''
-    const val = window.commandEditor.getValue().replace(/[\n\r]+/,'')
-    if (e.code == 'Enter') {
-      let chunks = val.split(' ') // TODO: better parsing to account for varying json format
-      const method = chunks[0]
-      let params = []
-      if(chunks.length > 1) {
-          try {
-              params = chunks.slice(1).map(c => {
-                try {
-                  return JSON.parse(c)
-                } catch (e) {
-                  return JSON.parse(`"${c}"`)
-                }
-              })
-          } catch (err) {
-            editorModule.appendToEditor(window.resultEditor, `Parse error: ${val} - ${err}\n\n`)
-            window.commandEditor.setValue('')
-            return
-          }
-      }
-      consoleBuffer.unshift(val)
-      post({ method: method, params: params }).then(response => {
-        let content = `// ${method} ${params.join(' ')}\n`
-          content += JSON.stringify(response, null, 2) + '\n\n'
-          editorModule.appendToEditor(window.resultEditor, content)
-      }).catch(err => console.log) 
-      window.commandEditor.setValue('')
-      consoleBufferIndex = 0
-    } 
-  })
-  editorModule.init(helpers)
-  window.resultEditor.addAction({
-    id: 'action-id-insert-command',
-    label: 'Add to command',
-    keybindings: [
-        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_I
-    ],
-    precondition: null,
-    keybindingContext: null,
-    contextMenuGroupId: 'navigation',
-    contextMenuOrder: 1.1,
-    run: function(ed) {
-        const word = ed.getModel().getWordAtPosition(ed.getPosition())
-        if(word) {
-            const cmd = window.commandEditor.getPosition()
-            window.commandEditor.executeEdits('', [
-                { range: new monaco.Range(cmd.lineNumber, cmd.column, cmd.lineNumber, cmd.column), text: word.word }
-            ])
-            const col = cmd.column+word.word.length
-            window.commandEditor.setSelection(new monaco.Range(1,col,1,col))
-            window.commandEditor.focus()
-        }
-        return null;
-    }
-});
+  editorModule.init(window.commandEditor)
 
+  const editorResult = new resultModule.ResultEditor(window.resultEditor, window.commandEditor)
+  const editorCommand = new commandModule.CommandEditor(window.commandEditor, window.resultEditor)
+
+  getHelp()
 });
