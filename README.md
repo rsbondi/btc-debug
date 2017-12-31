@@ -36,12 +36,42 @@ The `-host` and `-config` options allow for remote connection
 
 Also, launch configurations are provided for vscode users
 
+## Console
+
+### Features
+#### Command Input
+* A multi line code editor for entering commands rather than a single line console input
+* Code completion for all RPC commands
+* Full help text when hovering a command
+* Argument hints based on command entered
+* Execute via keyboard, menu, command pallet or codelens
+* File load and save
+
+#### Result Display
+* Folding of results for better focus on results of interest
+* Mini Map for easy navigation
+* Insert from results to the command editor
+* File load and save
+
 ### Keyboard Shortcuts
 | Command | Description                         |
 | ------- | -----------                         |
+| F5      | execute command at command editor cursor postion |
 | CtrlCmd+i | Insert from result cursor position to command editior selection, this allows easy reuse of results as command arguments
 
-### Packaging
+### Entering Commands
+
+A single command may be multi line.  Leave whitespace for argument separation, JSON objects are parsed as a single argument.
+
+example:
+```
+createmultisig 2
+[
+    "key1",
+    "key2"
+]
+```
+## Packaging
 install [electron-packager](https://www.npmjs.com/package/electron-packager)
 
 and run `electron-packager .`
