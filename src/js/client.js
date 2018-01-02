@@ -26,13 +26,14 @@ function loadEditor(editor) {
 }
 
 menu.append(new MenuItem({
-  label: 'Command',
-  submenu: [
-    { label: 'Execute at Cursor', click() { window.commandEditor.getAction('action-execute-command').run() } },
-    { label: 'Save', click() { saveEditor(window.commandEditor) } },
-    { label: 'Load', click() { loadEditor(window.commandEditor) } },
-  ]
+    label: 'Command',
+    submenu: [
+      { label: 'Execute at Cursor', click() { window.commandEditor.getAction('action-execute-command').run() } },
+      { label: 'Save', click() { saveEditor(window.commandEditor) } },
+      { label: 'Load', click() { loadEditor(window.commandEditor) } },
+    ]
 }))
+
 menu.append(new MenuItem({
   label: 'Console',
   submenu: [
@@ -41,7 +42,7 @@ menu.append(new MenuItem({
     { label: 'Load', click() { loadEditor(window.resultEditor) } },
   ]
 }))
-Menu.setApplicationMenu(menu)
+Menu.setApplicationMenu(null)
 
 const argv = require('electron').remote.process.argv
 let tabs = document.querySelectorAll('.tab')
@@ -88,6 +89,7 @@ config.split('\n').forEach(line => {
 for(let t=0; t<tabs.length;t++) {
   const tab = tabs[t]
   tab.addEventListener('click', (e) => {
+    Menu.setApplicationMenu(null)
     for (var t = 0; t < tabs.length; t++) {
       const tab = tabs[t]
       const content = document.querySelector(tab.dataset.ref)
@@ -104,6 +106,7 @@ for(let t=0; t<tabs.length;t++) {
 
 const consoleTab = document.querySelector('div[data-ref="#console"]')
 const getHelp = function() {
+  Menu.setApplicationMenu(menu)
   if(!window.helpers)
     post({method: 'help'}).then(response => {
       window.helpers = response.result.split('\n').reduce((o, c, i) => {
@@ -241,5 +244,4 @@ editorModule.require(['vs/editor/editor.main'], function () {
   const editorResult = new resultModule.ResultEditor(window.resultEditor, window.commandEditor)
   const editorCommand = new commandModule.CommandEditor(window.commandEditor, window.resultEditor)
 
-  getHelp()
 });
