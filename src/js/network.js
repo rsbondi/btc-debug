@@ -36,10 +36,10 @@ const getNet = function () {
       const maxrate = netinfo.slice(netinfo.length > NET_INTERVAL_COUNT ? 1 : 0).reduce((max, inf) => { return Math.max(max, inf.recrate, inf.sentrate) }, 0)
 
       if(maxrate > 0) {
-          const yscale = height / maxrate / 2.1
+          const yscale = height / maxrate / 1.03 // leave some space at top of graph
           const yoffset = 0 - (yscale * height - height)
-          drawLine(width + graphindex, height, width + graphindex, height - (current.sent - previous.sent), 'red')
-          drawLine(width - 1 + graphindex, height, width - 1 + graphindex, height - (current.received - previous.received), 'green')
+          drawLine(width + graphindex, height, width + graphindex, height - (current.sent - previous.sent) / seconds, 'red')
+          drawLine(width - 1 + graphindex, height, width - 1 + graphindex, height - (current.received - previous.received) / seconds, 'green')
     
           if (ref) graphref.removeChild(ref)
           const maxtext = maxrate.toFixed(0)
