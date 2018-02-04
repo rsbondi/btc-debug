@@ -57,7 +57,8 @@ Also, launch configurations are provided for vscode users
 | Command | Description                         |
 | ------- | -----------                         |
 | F5      | execute command at command editor cursor postion |
-| CtrlCmd+i | Insert from result cursor position to command editior selection, this allows easy reuse of results as command arguments
+| CtrlCmd+i | Insert from result cursor position to command editior selection, this allows easy reuse of results as command arguments |
+| CtrlCmd+r | reverse selection of byte string(2 characters at a time) in the command editor.  This is handy if you are working with the direct protocol and recieve a transaction hash from `inv` command for example, it is reversed, you can retrieve with rpc by reversing with this command. |
 
 ### Entering Commands
 

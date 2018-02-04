@@ -3,6 +3,30 @@ class CommandEditor {
     this.editor = editor
     this.resultEditor = result
     this.addExecuteAction()
+
+    this.editor.addAction({
+      id: 'action-selection-reverse-command',
+      label: 'Reverse Bytes',
+      keybindings: [
+        monaco.KeyMod.CtrlCmd | monaco.KeyCode.KEY_R
+      ],
+      precondition: null,
+      keybindingContext: null,
+      contextMenuGroupId: 'navigation',
+      contextMenuOrder: 1.1,
+      run: function (ed) {
+        const selection = ed.getSelection()
+        const str = ed.getModel().getValueInRange(selection)
+        let buf = []
+        for (let i = 0; i < str.length; i += 2) {
+          buf.push(str.slice(i, i + 2))
+        }
+        ed.executeEdits('', [
+          { range: selection, text: buf.reverse().join('') }
+        ])
+        return null;
+      }
+    })
   }
 
   appendToEditor (editor, text) {
