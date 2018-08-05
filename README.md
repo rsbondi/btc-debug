@@ -86,4 +86,4 @@ ex. To run with litecoin testnet `npm start -- -port=19332 -config=/home/yourhom
 
 ## Screenshot
 
-![screenshot.png](https://github.com/rsbondi/btc-debug/blob/master/screenshot.png "What it looks like")
+![debug.gif](https://github.com/rsbondi/btc-debug/blob/master/debug.gif "What it looks like")
