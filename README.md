@@ -33,7 +33,7 @@ The `-host` and `-config` options allow for remote connection
 
 ## Running
 
-`npm start [-- [-config -port -host]]` 
+`npm start [-- [-config -port -host -title]]` 
 
 Also, launch configurations are provided for vscode users
 
