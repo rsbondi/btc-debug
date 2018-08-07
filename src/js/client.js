@@ -77,6 +77,7 @@ const args = argv.reduce((o, c) => {
 
 port = args.port || '8332'
 host = args.host || '127.0.0.1'
+if(args.title) document.querySelector("title").innerHTML = args.title
 
 const config = fs.readFileSync(args.config || `${os.homedir()}/.bitcoin/bitcoin.conf`, 'utf8');
 config.split('\n').forEach(line => {

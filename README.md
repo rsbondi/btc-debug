@@ -25,6 +25,7 @@ This can be overridden from the command line with the -config flag ex. `-config=
 | -config | path to config file described above |
 | -host   | default 127.0.0.1                   |
 | -port   | default 8332(Main Net)              |
+| -title  | displays in title bar, useful if running multiple instances |
 
 The `-port` option lets you run on test net by setting to 18332
 
