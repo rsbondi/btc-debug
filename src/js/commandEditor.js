@@ -69,7 +69,7 @@ class CommandEditor {
                 if(ti===0) return
                 const prevToken =  tokens[ti-1] 
                 const tokenVal = val.slice(t.offset, ti == tokens.length-1 ? val.length : tokens[ti+1].offset)
-                if(prevToken.type =="white.bitcoin-rpc") {
+                if(prevToken.type =="white.bitcoin-rpc" || prevToken.type=="bracket.square.open.bitcoin-rpc") {
                     if((t.type=="bracket.square.open.bitcoin-rpc" || t.type=="bracket.curly.open.bitcoin-rpc"))  {
                         brackets.unshift('')
                     } else if(!brackets.length) params.push(JSON.parse(tokenVal))                    
